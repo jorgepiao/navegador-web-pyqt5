@@ -1,7 +1,6 @@
 import sys
 import os
 import json
-
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                             QPushButton, QLabel, QLineEdit, QTabBar,
                             QFrame,QStackedLayout)
@@ -33,17 +32,13 @@ class App(QFrame):
         #- crear pestañas
         self.tabbar = QTabBar(movable=True, tabsClosable=True)
         self.tabbar.tabCloseRequested.connect(self.CerrarTab)
-
-        # self.tabbar.addTab('Pestaña 1')
-        # self.tabbar.addTab('Pestaña 2')
+        self.tabbar.tabBarClicked.connect(self.CambiarTab)
 
         self.tabbar.setCurrentIndex(0)
-
 
         #- seguimiento de pestañas
         self.cuentaTab = 0 #tabCount
         self.tabs = []
-
 
         #- crear barra de direcciones
         self.Toolbar = QWidget()
@@ -53,19 +48,16 @@ class App(QFrame):
         self.Toolbar.setLayout(self.ToolbarLayout)
         self.ToolbarLayout.addWidget(self.addressbar)
 
-
         #- boton nueva pestaña
         self.botonAgregarTab = QPushButton('+') # AddTabButton
         self.botonAgregarTab.clicked.connect(self.AgregarTab)
 
         self.ToolbarLayout.addWidget(self.botonAgregarTab)
         
-
         #- establecer vista principal
         self.contenedor = QWidget() # container
         self.contenedor.layout = QStackedLayout()
         self.contenedor.setLayout(self.contenedor.layout)
-
 
         self.layout.addWidget(self.tabbar)
         self.layout.addWidget(self.Toolbar)
@@ -80,6 +72,7 @@ class App(QFrame):
 
     def CerrarTab(self, i): # CloseTab()
         self.tabbar.removeTab(i)
+
 
     def AgregarTab(self): # AddTab
         i = self.cuentaTab
@@ -107,6 +100,16 @@ class App(QFrame):
         self.tabbar.setTabData(i, 'tab' + str(i))
         self.tabbar.setCurrentIndex(i)
 
+        self.cuentaTab += 1
+
+
+    def CambiarTab(self, i):
+        tab_dato = self.tabbar.tabData(i)
+        print('tab:', tab_dato)
+
+        tab_contenido = self.findChild(QWidget, tab_dato)
+        self.contenedor.layout.setCurrentWidget(tab_contenido)
+        # self.contenedor.layout.setCurrentWidget(self.tabs[i])
 
 
 
