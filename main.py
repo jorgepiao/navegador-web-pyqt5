@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                             QFrame,QStackedLayout)
 from PyQt5.QtGui import QIcon, QWindow, QImage
 from PyQt5.QtCore import *
+from PyQt5.QtWebEngineWidgets import *
 
 
 class BarraDirecciones(QLineEdit): # AddressBar()
@@ -33,10 +34,16 @@ class App(QFrame):
         self.tabbar = QTabBar(movable=True, tabsClosable=True)
         self.tabbar.tabCloseRequested.connect(self.CerrarTab)
 
-        self.tabbar.addTab('Pestaña 1')
-        self.tabbar.addTab('Pestaña 2')
+        # self.tabbar.addTab('Pestaña 1')
+        # self.tabbar.addTab('Pestaña 2')
 
         self.tabbar.setCurrentIndex(0)
+
+
+        #- seguimiento de pestañas
+        self.cuentaTab = 0 #tabCount
+        self.tabs = []
+
 
         #- crear barra de direcciones
         self.Toolbar = QWidget()
@@ -46,15 +53,61 @@ class App(QFrame):
         self.Toolbar.setLayout(self.ToolbarLayout)
         self.ToolbarLayout.addWidget(self.addressbar)
 
+
+        #- boton nueva pestaña
+        self.botonAgregarTab = QPushButton('+') # AddTabButton
+        self.botonAgregarTab.clicked.connect(self.AgregarTab)
+
+        self.ToolbarLayout.addWidget(self.botonAgregarTab)
+        
+
+        #- establecer vista principal
+        self.contenedor = QWidget() # container
+        self.contenedor.layout = QStackedLayout()
+        self.contenedor.setLayout(self.contenedor.layout)
+
+
         self.layout.addWidget(self.tabbar)
         self.layout.addWidget(self.Toolbar)
+        self.layout.addWidget(self.contenedor)
+
         self.setLayout(self.layout)
+
+        self.AgregarTab()
 
         self.show()
 
 
     def CerrarTab(self, i): # CloseTab()
         self.tabbar.removeTab(i)
+
+    def AgregarTab(self): # AddTab
+        i = self.cuentaTab
+
+        self.tabs.append(QWidget())
+        self.tabs[i].layout = QVBoxLayout()
+        self.tabs[i].setObjectName('pestaña' + str(i))
+        
+        #- abrir webview
+        self.tabs[i].content = QWebEngineView()
+        self.tabs[i].content.load(QUrl.fromUserInput('http://google.com'))
+
+        #- agregar webview al diseño de pestañas (layout)
+        self.tabs[i].layout.addWidget(self.tabs[i].content)
+
+        #- establecer pestaña top de [] al diseño (layout)
+        self.tabs[i].setLayout(self.tabs[i].layout)
+
+        #- agregar pestaña al top al widget apilado
+        self.contenedor.layout.addWidget(self.tabs[i])
+        self.contenedor.layout.setCurrentWidget(self.tabs[i])
+
+        #- establecer la pestaña al tope de la pantalla
+        self.tabbar.addTab('Nueva pestaña')
+        self.tabbar.setTabData(i, 'tab' + str(i))
+        self.tabbar.setCurrentIndex(i)
+
+
 
 
 if __name__ == "__main__":
