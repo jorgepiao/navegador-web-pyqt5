@@ -50,6 +50,9 @@ class App(QFrame):
 
         #- boton nueva pestaña
         self.botonAgregarTab = QPushButton('+') # AddTabButton
+
+        self.addressbar.returnPressed.connect(self.IrA)
+
         self.botonAgregarTab.clicked.connect(self.AgregarTab)
 
         self.ToolbarLayout.addWidget(self.botonAgregarTab)
@@ -110,6 +113,25 @@ class App(QFrame):
         tab_contenido = self.findChild(QWidget, tab_dato)
         self.contenedor.layout.setCurrentWidget(tab_contenido)
         # self.contenedor.layout.setCurrentWidget(self.tabs[i])
+
+
+    def IrA(self):
+        text = self.addressbar.text()
+        print(text)
+
+        i = self.tabbar.currentIndex()
+        tab = self.tabbar.tabData(i)
+        wv = self.findChild(QWidget, tab).content
+
+        if 'http' not in text:
+            if '.' not in text:
+                url = 'https://google.com/#q=' + text
+            else:
+                url = 'http://' + text
+        else:
+            url = text
+
+        wv.load(QUrl.fromUserInput(url))
 
 
 
